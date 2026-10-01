@@ -153,6 +153,26 @@ test_app.py::test_table_not_found PASSED
 ======================== 15 passed in X.XXs ========================
 ```
 
+## Demo Walkthrough
+
+### 1. Create a reservation
+
+Choose a restaurant and table, enter the customer details and time slot, then submit the reservation. The reservation appears immediately in the existing reservations list.
+
+![Successful reservation](docs/images/tablekeeper-demo/tablekeeper_successful_reservation.png)
+
+### 2. Prevent double-booking
+
+If another reservation overlaps the same table and time period, the application rejects it and displays a clear error message.
+
+![Overlapping reservation blocked](docs/images/tablekeeper-demo/tablekeeper_overlap_blocked.png)
+
+### 3. Verify the application
+
+The automated pytest suite validates the API, reservation creation, overlap detection, capacity limits, time validation, deletion, and utility functions.
+
+![Automated test suite passed](docs/images/tablekeeper-demo/tablekeeper_test_suite_passed.png)
+
 ## Application Structure
 
 ```
