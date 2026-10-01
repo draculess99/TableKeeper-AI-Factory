@@ -252,6 +252,50 @@ docker run -p 5000:5000 tablekeeper:latest
 
 The application will be available at `http://localhost:5000`
 
+## Railway Deployment
+
+### Overview
+
+TableKeeper is optimized for Railway Serverless/App Sleeping with minimal resource usage:
+
+- **Embedded Database**: SQLite database is embedded in the Flask process—no external service required
+- **No Volumes**: The application uses an ephemeral database that resets on deployment (suitable for demo)
+- **No Background Jobs**: No polling, scheduled tasks, or background processes
+- **Connection Management**: One database connection per request, properly closed after use
+- **Production Configuration**: Debug mode is automatically disabled in production
+
+### Deployment Steps
+
+1. **Connect Repository**
+   - Push this repository to GitHub
+   - Connect it to Railway via the Railway dashboard
+
+2. **Environment Configuration**
+   - Set `FLASK_ENV=production` (default via `os.getenv('FLASK_ENV', 'production')`)
+   - Set `FLASK_DEBUG=false` (default; only set to `true` for troubleshooting)
+   - Railway automatically exposes port via `PORT` environment variable
+
+3. **No Configuration Required**
+   - SQLite database initializes automatically on startup
+   - No database migration or setup scripts needed
+   - Flask debug mode is disabled by default
+
+### Low Usage Characteristics
+
+- **Ephemeral Database**: Database resets on each deployment (fine for demo, not for production persistence)
+- **No Persistent Volumes**: No volume mount required or used
+- **Serverless Sleep**: App will sleep when idle, consuming minimal resources
+- **Automatic Startup**: Database initializes instantly on request
+
+### Production Considerations
+
+For production use, consider:
+- Persistent volume mount for SQLite (if data retention needed)
+- Or migrate to PostgreSQL/MySQL with external database service
+- Add monitoring and logging
+- Enable HTTPS and authentication
+- Set `FLASK_DEBUG=false` explicitly in production
+
 ## Double-Booking Prevention Logic
 
 The application prevents double-booking through:
@@ -291,11 +335,15 @@ venv\Scripts\Activate.ps1
 
 ## Development Notes
 
-- The application uses Flask's development server (not suitable for production)
-- SQLite database is file-based and stored in the working directory
-- The UI uses vanilla JavaScript with no external dependencies (except Flask on backend)
-- All validation is performed server-side for security
-- Timestamps are stored in ISO 8601 format
+- **Flask Configuration**: Debug mode is disabled by default for production. Enable locally with `set FLASK_DEBUG=true` (Windows) or `export FLASK_DEBUG=true` (Unix), then `python app.py`
+- **Environment Variables**:
+  - `FLASK_ENV`: Set to `production` by default (use `development` for local debugging with auto-reload)
+  - `FLASK_DEBUG`: Set to `false` by default (set to `true` to enable debug mode and auto-reload)
+  - `PORT`: Defaults to 5000, automatically set by Railway
+- **SQLite Database**: File-based, stored in working directory, automatically initialized on startup
+- **UI**: Vanilla JavaScript with no external dependencies (except Flask on backend)
+- **Validation**: All business logic validated server-side for security
+- **Timestamps**: Stored in ISO 8601 format with UTC timezone awareness
 
 ## License
 

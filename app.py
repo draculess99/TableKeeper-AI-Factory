@@ -2,9 +2,11 @@ from flask import Flask, render_template, request, jsonify
 from datetime import datetime, timedelta, timezone
 import sqlite3
 import os
-import json
 
 app = Flask(__name__)
+app.config['ENV'] = os.getenv('FLASK_ENV', 'production')
+app.config['DEBUG'] = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
+
 DB_PATH = 'tablekeeper.db'
 
 def get_db():
@@ -210,4 +212,4 @@ def delete_reservation(reservation_id):
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True, port=5000)
+    app.run(debug=app.config['DEBUG'], port=int(os.getenv('PORT', 5000)))
