@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TableKeeper - Restaurant Reservations</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .content { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .alert.error {
+            background: #fee;
+            color: #c33;
+            border-left: 4px solid #c33;
+        }
+
+        .alert.success {
+            background: #efe;
+            color: #3c3;
+            border-left: 4px solid #3c3;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .reservations-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .reservation-item {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reservation-info {
+            flex: 1;
+        }
+
+        .reservation-info strong {
+            color: #333;
+        }
+
+        .reservation-info small {
+            color: #999;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .delete-btn {
+            background: #f66;
+            padding: 6px 12px;
+            font-size: 0.9em;
+            width: auto;
+        }
+
+        .delete-btn:hover {
+            background: #d44;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ TableKeeper</h1>
+            <p>Restaurant Reservation System</p>
+        </header>
+
+        <div class="content">
+            <div class="card">
+                <h2>Create Reservation</h2>
+                <div id="alertCreate" class="alert"></div>
+
+                <div class="form-group">
+                    <label for="restaurant">Restaurant</label>
+                    <select id="restaurant" onchange="loadTables()">
+                        <option value="">-- Select Restaurant --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="table">Table</label>
+                    <select id="table">
+                        <option value="">-- Select Table --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="customerName">Customer Name</label>
+                    <input type="text" id="customerName" placeholder="John Doe" maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label for="partySize">Party Size</label>
+                    <input type="number" id="partySize" min="1" max="20" value="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="startTime">Start Time</label>
+                    <input type="datetime-local" id="startTime">
+                </div>
+
+                <div class="form-group">
+                    <label for="endTime">End Time</label>
+                    <input type="datetime-local" id="endTime">
+                </div>
+
+                <button onclick="createReservation()">Create Reservation</button>
+            </div>
+
+            <div class="card">
+                <h2>Existing Reservations</h2>
+                <div class="form-group">
+                    <label for="filterRestaurant">Filter by Restaurant</label>
+                    <select id="filterRestaurant" onchange="loadReservations()">
+                        <option value="">-- All Restaurants --</option>
+                    </select>
+                </div>
+                <div id="reservationsList" class="reservations-list">
+                    <div class="loading">Loading reservations...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        function showAlert(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = `alert ${type} show`;
+            setTimeout(() => el.classList.remove('show'), 5000);
+        }
+
+        function localDateTimeValue(date) {
+            const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+            return local.toISOString().slice(0, 16);
+        }
+
+        function setDefaultTimes() {
+            const now = new Date();
+            now.setHours(now.getHours() + 1, 0, 0, 0);
+
+            document.getElementById('startTime').value = localDateTimeValue(now);
+
+            const end = new Date(now);
+            end.setHours(end.getHours() + 2);
+            document.getElementById('endTime').value = localDateTimeValue(end);
+}
+
+        async function loadRestaurants() {
+            try {
+                const response = await fetch(`${API_BASE}/restaurants`);
+                const restaurants = await response.json();
+
+                const select = document.getElementById('restaurant');
+                const filterSelect = document.getElementById('filterRestaurant');
+
+                restaurants.forEach(r => {
+                    const option = document.createElement('option');
+                    option.value = r.id;
+                    option.textContent = r.name;
+                    select.appendChild(option);
+
+                    const filterOption = document.createElement('option');
+                    filterOption.value = r.id;
+                    filterOption.textContent = r.name;
+                    filterSelect.appendChild(filterOption);
+                });
+            } catch (err) {
+                console.error('Failed to load restaurants:', err);
+            }
+        }
+
+        async function loadTables() {
+            const restaurantId = document.getElementById('restaurant').value;
+            const tableSelect = document.getElementById('table');
+
+            tableSelect.innerHTML = '<option value="">-- Select Table --</option>';
+
+            if (!restaurantId) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/tables/${restaurantId}`);
+                const tables = await response.json();
+
+                tables.forEach(t => {
+                    const option = document.createElement('option');
+                    option.value = t.id;
+                    option.textContent = `Table ${t.table_number} (Capacity: ${t.capacity})`;
+                    tableSelect.appendChild(option);
+                });
+            } catch (err) {
+                console.error('Failed to load tables:', err);
+            }
+        }
+
+        async function createReservation() {
+            const tableId = document.getElementById('table').value;
+            const customerName = document.getElementById('customerName').value;
+            const partySize = document.getElementById('partySize').value;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+
+            if (!tableId || !customerName || !startTime || !endTime) {
+                showAlert('alertCreate', 'Please fill all fields', 'error');
+                return;
+            }
+
+            const start = new Date(startTime).toISOString();
+            const end = new Date(endTime).toISOString();
+
+            try {
+                const response = await fetch(`${API_BASE}/reservations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        table_id: parseInt(tableId),
+                        customer_name: customerName,
+                        party_size: parseInt(partySize),
+                        start_time: start,
+                        end_time: end
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.status === 201) {
+                    showAlert('alertCreate', 'Reservation created successfully!', 'success');
+                    document.getElementById('customerName').value = '';
+                    document.getElementById('partySize').value = '1';
+                    setDefaultTimes();
+                    loadReservations();
+                } else {
+                    showAlert('alertCreate', data.error || 'Failed to create reservation', 'error');
+                }
+            } catch (err) {
+                showAlert('alertCreate', 'Error creating reservation', 'error');
+                console.error(err);
+            }
+        }
+
+        async function loadReservations() {
+            const filterRestaurantId = document.getElementById('filterRestaurant').value;
+            const url = filterRestaurantId ? `${API_BASE}/reservations?restaurant_id=${filterRestaurantId}` : `${API_BASE}/reservations`;
+
+            try {
+                const response = await fetch(url);
+                const reservations = await response.json();
+
+                const container = document.getElementById('reservationsList');
+
+                if (reservations.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No reservations found</div>';
+                    return;
+                }
+
+                container.innerHTML = reservations.map(r => {
+                    const start = new Date(r.start_time).toLocaleString();
+                    const end = new Date(r.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    return `
+                        <div class="reservation-item">
+                            <div class="reservation-info">
+                                <strong>${r.customer_name}</strong>
+                                <small>${r.restaurant_name} - Table ${r.table_number}</small>
+                                <small>Party of ${r.party_size} | ${start} - ${end}</small>
+                            </div>
+                            <button class="delete-btn" onclick="deleteReservation(${r.id})">Delete</button>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('Failed to load reservations:', err);
+                document.getElementById('reservationsList').innerHTML = '<div class="empty-state">Error loading reservations</div>';
+            }
+        }
+
+        async function deleteReservation(id) {
+            if (confirm('Delete this reservation?')) {
+                try {
+                    await fetch(`${API_BASE}/reservations/${id}`, { method: 'DELETE' });
+                    loadReservations();
+                } catch (err) {
+                    console.error('Failed to delete reservation:', err);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRestaurants();
+            loadReservations();
+            setDefaultTimes();
+        });
+    </script>
+</body>
+</html>
