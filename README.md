@@ -24,6 +24,19 @@ A Stage 1 MVP for a restaurant reservation application that prevents double-book
 - **Testing**: pytest
 - **Deployment**: Docker-ready (Dockerfile included)
 
+## Architecture
+
+```mermaid
+flowchart LR
+    U[User Browser] --> F[Flask Web App]
+    F --> API[Reservation API]
+    API --> V[Validation and Conflict Check]
+    V --> DB[(SQLite Database)]
+    DB --> API
+    API --> F
+    F --> U
+```
+
 ## Setup & Installation (Windows)
 
 ### Prerequisites
