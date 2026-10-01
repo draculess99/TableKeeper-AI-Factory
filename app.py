@@ -212,4 +212,4 @@ def delete_reservation(reservation_id):
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=app.config['DEBUG'], port=int(os.getenv('PORT', 5000)))
+    app.run(host='0.0.0.0', debug=app.config['DEBUG'], port=int(os.getenv('PORT', 5000)))
