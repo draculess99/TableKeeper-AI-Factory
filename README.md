@@ -345,6 +345,68 @@ venv\Scripts\Activate.ps1
 - **Validation**: All business logic validated server-side for security
 - **Timestamps**: Stored in ISO 8601 format with UTC timezone awareness
 
+## Dark Factory Submission Evidence
+
+This repository is a complete submission for the **WeAreDevelopers x BAND "Dark Factory"** hackathon challenge.
+
+### Factory Documentation
+
+- **[FACTORY.md](FACTORY.md)** — Complete explanation of the five-seat BAND team structure (Planner, Implementer, Test Author, Reviewer, Integrator), handoff sequence, mandate design, verification evidence gates, and recovery process
+
+- **[mandates/](mandates/)** — Generic standing instructions for each role:
+  - [planner.md](mandates/planner.md) — Task specification and acceptance criteria
+  - [implementer.md](mandates/implementer.md) — Clean code and implementation standards
+  - [test_author.md](mandates/test_author.md) — Verification and acceptance testing
+  - [reviewer.md](mandates/reviewer.md) — Code quality, security, and architecture review
+  - [integrator.md](mandates/integrator.md) — Merging, deployment, and release management
+
+### Buildable Stage 1 Service
+
+- **[stage-1/](stage-1/)** — Complete, tested, deployable TableKeeper service
+  - [stage-1/app.py](stage-1/app.py) — Flask application with SQLite
+  - [stage-1/test_app.py](stage-1/test_app.py) — 15 automated tests
+  - [stage-1/requirements.txt](stage-1/requirements.txt) — Dependencies
+  - [stage-1/Dockerfile](stage-1/Dockerfile) — Container image
+  - [stage-1/templates/index.html](stage-1/templates/index.html) — Web UI
+  - [stage-1/README.md](stage-1/README.md) — Build and run instructions
+
+### Verification Evidence
+
+- **[verify_clean_container.ps1](verify_clean_container.ps1)** — Script to build Docker image and verify deployment readiness
+
+### Test Suite Results
+
+Run the full automated test suite:
+```powershell
+pytest stage-1/test_app.py -v
+# Expected: 15 passed
+```
+
+### BAND Room Export
+
+- **[band-export/](band-export/)** — Placeholder for BAND Desktop room session export
+
+### How to Verify
+
+1. **Test the service locally:**
+   ```powershell
+   cd stage-1
+   python -m venv venv
+   venv\Scripts\Activate.ps1
+   pip install -r requirements.txt
+   pytest test_app.py -v
+   ```
+
+2. **Verify Docker deployment:**
+   ```powershell
+   .\verify_clean_container.ps1
+   ```
+
+3. **Review factory structure:**
+   - Read [FACTORY.md](FACTORY.md)
+   - Review [mandates/](mandates/)
+   - Check [stage-1/](stage-1/)
+
 ## License
 
 Created for WeAreDevelopers Software Factory Demonstration - October 2026
