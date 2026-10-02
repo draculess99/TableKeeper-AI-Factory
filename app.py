@@ -15,11 +15,13 @@ def get_db():
     return conn
 
 def init_db():
-    if os.path.exists(DB_PATH):
-        os.remove(DB_PATH)
-
     conn = get_db()
     c = conn.cursor()
+
+    c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='restaurants'")
+    if c.fetchone():
+        conn.close()
+        return
 
     c.execute('''CREATE TABLE restaurants
                  (id INTEGER PRIMARY KEY, name TEXT UNIQUE, timezone TEXT DEFAULT 'UTC')''')
