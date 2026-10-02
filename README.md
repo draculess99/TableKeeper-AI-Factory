@@ -372,7 +372,7 @@ This repository is a complete submission for the **WeAreDevelopers x BAND "Dark 
 
 ### Verification Evidence
 
-- **[verify_clean_container.ps1](verify_clean_container.ps1)** — Script to build Docker image and verify deployment readiness
+- **[verify_clean_container.ps1](verify_clean_container.ps1)** — Script that builds the Stage 1 Docker image and verifies it starts with no outbound network
 
 ### Test Suite Results
 
@@ -384,7 +384,7 @@ pytest stage-1/test_app.py -v
 
 ### BAND Room Export
 
-- **[band-export/](band-export/)** — Placeholder for BAND Desktop room session export
+- **[tablekeeper-band-room-export.json](band-export/tablekeeper-band-room-export.json)** — Full export of the BAND Desktop room used for this submission, including the factory-session record.
 
 ### How to Verify
 
